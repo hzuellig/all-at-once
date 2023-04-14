@@ -1,5 +1,5 @@
 # All At Once
-## Browser Extension, Artistic, Visualization Person History
+## Browser Extension, Artistic, Visualization Personal History
 
 This browser extension takes screenshots and creates a pattern of the pages you visited during the last 10 days. A compressed image of each screenshot is created, which is then used to build the pattern. The number of times the image is repeated depends on the length of time this tab was open. Each day creates its unique visual representation. Inspired by Pierre Buttins artwork Landscapes.
 
