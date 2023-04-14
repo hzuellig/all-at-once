@@ -1,0 +1,23 @@
+{
+    "background": {
+      "scripts": ["background.js"]
+    },
+    "description": "This browser extension takes screenshots and creates a pattern of the pages you visited in the last few days. A compressed image of each screenshot is created, which is then used like a thread to build the pattern. The number of times the thread is repeated depends on the length of time this tab was open. Inspired by Pierre Buttins work Landscapes.",
+    "icons": {
+      "48": "icons/once48.png",
+      "96": "icons/once96.png"
+    },
+    "browser_action": {
+      "default_icon": "icons/once96.png"
+  },
+    "permissions": [
+      "activeTab",
+      "history",
+      "tabs",
+      "storage",
+      "<all_urls>"
+    ],
+   "manifest_version": 2,
+    "name": "All At Once",
+    "version": "1.0"
+  }
