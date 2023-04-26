@@ -1,5 +1,16 @@
+//@todo: key screenshotToStore[] not tabId, as tabId starts to count at zero if browser is closed
+
 //create tabs
 let captureDone = false;
+let n = 0;
+let oldTab = -1;
+
+let stored = browser.storage.local.get();
+stored.then(onGot, onError);
+function onGot(data){
+    n = Object.keys(data).length;
+}
+
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 
@@ -13,11 +24,12 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
         function onCaptured(imageUri) {
             if (!captureDone) {
+
                 cropImg(imageUri,
                     function (result) {
                         storeVisit(result.src)
                     });
-                captureDone = true;
+
             }
             // call crop function
             // https://cloudinary.com/guides/automatic-image-cropping/cropping-images-in-javascript
@@ -41,7 +53,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
             let image = new Image();
             image.src = img;
-            
+
 
 
             image.onload = function () {
@@ -64,11 +76,19 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         }
 
         function storeVisit(data) {
-
-            screenshotToStore[tab.id] = { "screenshot": data, "open": Date.now(), "close": 0, "window": tab.windowId, "url": tab.url };
+            
+            if (oldTab != tabId) {
+                //prevent from storing multiple screenshots
+                n++;
+                
+            }
+            screenshotToStore[n] = { "screenshot": data, "open": Date.now(), "close": 0, "window": tab.windowId, "url": tab.url, "tabid": tabId };
             browser.storage.local.set(screenshotToStore);
-
+            oldTab = tabId;
             captureDone = false; //make ready for new one
+            
+
+
         }
 
 
@@ -80,23 +100,36 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //close tab, set close timestamp
 browser.tabs.onRemoved.addListener(handleRemoved);
 let current;
-function handleRemoved(tabId) {
+
+
+
+
+
+function handleRemoved(tabId, removeInfo) {
     current = tabId;
+
+
+    let windowId = removeInfo.windowId;
+
     let storedScreenshots = browser.storage.local.get();
-    
+
     storedScreenshots.then(onGotSingle, onError);
 
     function onGotSingle(data) {
 
         for (const [key, value] of Object.entries(data)) {
-            if (parseInt(key) === tabId) {
+            if (parseInt(data[key].tabid) === tabId && parseInt(data[key].window) === windowId && parseInt(data[key].close) == 0) {
                 data[key].close = Date.now();
-                console.log(data[key].close);
+                //console.log(data[key].close);
             }
         }
 
         browser.storage.local.set(data);
     }
+
+
+
+
 
 
 }
